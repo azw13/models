@@ -28,6 +28,17 @@ python model_main_tf2.py -- \
 """
 from absl import flags
 import tensorflow.compat.v2 as tf
+
+# --- Compatibility shim for TF>=2.14 where internal control_flow_ops.case is removed ---
+# tf_slim (tfexample_decoder) still references tensorflow.python.ops.control_flow_ops.case.
+try:
+    from tensorflow.python.ops import control_flow_ops  # internal
+    if not hasattr(control_flow_ops, "case"):
+        control_flow_ops.case = tf.case
+except Exception:
+    # If it fails, continue; training may still fail if tf_slim hits missing symbol.
+    pass
+
 from object_detection import model_lib_v2
 
 flags.DEFINE_string('pipeline_config_path', None, 'Path to pipeline config '
