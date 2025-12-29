@@ -110,7 +110,8 @@ def main(unused_argv):
     elif FLAGS.num_workers > 1:
       strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy()
     else:
-      strategy = tf.compat.v2.distribute.MirroredStrategy()
+      # strategy = tf.compat.v2.distribute.MirroredStrategy() # マルチGPU
+      strategy = tf.distribute.get_strategy() # シングルGPU
 
     with strategy.scope():
       model_lib_v2.train_loop(
